@@ -1,0 +1,11 @@
+ansible_user: ec2-user
+ansible_password: DevOps321
+mongodb_host: mongodb.pari92s.online
+redis_host: redis.pari92s.online
+mysql_host: mysql.pari92s.online
+rabbitmq_host: rabbitmq.pari92s.online
+catalogue_host: catalogue.pari92s.online
+user_host: user.pari92s.online
+cart_host: cart.pari92s.online
+shipping_host: shipping.pari92s.online
+payment_host: payment.pari92s.online
