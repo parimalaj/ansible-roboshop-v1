@@ -1,12 +1,12 @@
-- name: "Create instances and route53 records"
+- name: Create instances and Route 53 records
   hosts: localhost
   connection: local
 
   vars:
-    instances: [mongodb, redis, mysql, rabbitmq, catalogue, user, cart, shipping, payment, frontend]
-    action: "create"
-    domain_name: "pari92s.online"
-    ami_id: "ami-0055977a6e828a4f4"
+    instances: [mongodb, redis, mysql, rabbitmq, catalogue, user, cart, shipping, payment, dispatch, frontend]
+    action: create
+    domain_name: pari92s.online
+    ami_id: ami-0055977a6e828a4f4
 
   tasks:
   - name: create ec2 instance
@@ -18,6 +18,7 @@
       - roboshop-common
       - "roboshop-{{ item }}"
       region: us-east-1
+      wait: true
     loop: "{{ instances }}"
     when: action == "create"
     register: ec2_output
@@ -26,10 +27,10 @@
     amazon.aws.route53:
       state: present
       zone: "{{ domain_name }}"
-      record: "{{ item.item }}.{{ domain_name }}" # mongodb.daws92s.store
+      record: "{{ domain_name if item.item == 'frontend' else item.item + '.' + domain_name }}"
       type: A
       ttl: 1
-      value: "{{ item.instances[0].private_ip_address }}"
+      value: "{{ item.instances[0].public_ip_address if item.item == 'frontend' else item.instances[0].private_ip_address }}"
       overwrite: true
     loop: "{{ ec2_output.results }}"
     when: action == "create"
@@ -38,9 +39,9 @@
     amazon.aws.route53:
       state: absent
       zone: "{{ domain_name }}"
-      record: "{{ item }}.{{ domain_name }}"
-      ttl: 1
+      record: "{{ domain_name if item == 'frontend' else item + '.' + domain_name }}"
       type: A
+      ttl: 1
     loop: "{{ instances }}"
     when: action == "delete"
 
@@ -52,12 +53,3 @@
       wait: false
     loop: "{{ instances }}"
     when: action == "delete"
-
-
-
-
-  
-
-
-
-  
