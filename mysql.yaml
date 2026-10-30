@@ -1,0 +1,25 @@
+- name: configure mysql
+  hosts: mysql
+  become: yes
+
+  tasks:
+  - name: copy mysql repo
+    copy:
+      src: mysql.repo
+      dest: /etc/yum.repos.d/mysql.repo
+
+  - name: install mysql server
+    package:
+      name: mysql-community-server
+      state: present
+
+  - name: start and enable mysql 
+    service:
+      name: mysqld
+      state: started
+      enabled: yes
+
+  - name: setup mysql root password
+    command: mysql_secure_installation --set-root-pass "{{ mysql_root_password }}"
+       
+  
