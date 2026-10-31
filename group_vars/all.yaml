@@ -9,3 +9,4 @@ user_host: user.pari92s.online
 cart_host: cart.pari92s.online
 shipping_host: shipping.pari92s.online
 payment_host: payment.pari92s.online
+mysql_root_password: RoboShop@1
