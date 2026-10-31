@@ -13,6 +13,14 @@
       - maven-openjdk25 # installing this so that we no need to set JAVA_HOME again
       state: present
 
+  - name: find java 25 path
+    shell: readlink -f $(ls /usr/lib/jvm/java-25-openjdk*/bin/java | head -1)
+    register: java25
+    changed_when: false
+
+  - name: make java 25 the default
+    command: alternatives --set java {{ java25.stdout }}
+
   - name: create roboshop system user
     user:
       name: roboshop
@@ -61,7 +69,7 @@
   - name: install dependencies
     command: mvn clean package
     args:
-     chdir: /app
+      chdir: /app
 
   - name: move jar file
     copy:
@@ -102,7 +110,3 @@
       name: shipping
       state: restarted
       enabled: yes
-
-
-
-  
