@@ -3,9 +3,9 @@
   become: yes
 
   tasks:
-  - name: copy mongo repo
+  - name: copy mongodb repo
     copy:
-      src: mongo.repo
+      src: mongodb.repo
       dest: /etc/yum.repos.d/mongo.repo
  
   - name: install mongodb server
