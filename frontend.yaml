@@ -1,0 +1,59 @@
+- name: configure frontend server
+  hosts: frontend
+  become: yes
+  
+  tasks:
+  - name: disable default nginx
+    command: dnf module disable nginx -y
+
+  - name: enable nginx 1.26
+    command: dnf module enable nginx:1.26 -y
+
+  - name: install nginx
+    dnf:
+      name: nginx
+      state: present
+
+  - name: remove default content
+    file:
+      path: /usr/share/nginx/html
+      state: absent
+
+  - name: create html directory
+    file:
+      path: /usr/share/nginx/html
+      state: directory
+
+  - name: remove frontend.zip
+    file:
+      path: /tmp/frontend.zip
+      state: absent
+
+  - name: download frontend content
+    get_url:
+      url: https://raw.githubusercontent.com/daws-92s/roboshop-documentation/refs/heads/main/artifacts/frontend-v4.zip
+      dest: /tmp/frontend.zip
+
+  - name: unzip frontend
+    unarchive:
+      src: /tmp/frontend.zip
+      dest: /usr/share/nginx/html
+      remote_src: yes
+
+  - name: copy roboshop nginx config
+    template:
+      src: roboshop.conf.j2
+      dest: /etc/nginx/default.d/roboshop.conf
+
+  - name: allow nginx to connect to backends (SELinux)
+    command: setsebool -P httpd_can_network_connect 1
+
+  - name: check nginx config
+    command: nginx -t
+    changed_when: false
+
+  - name: start and enable nginx
+    service:
+      name: nginx
+      state: restarted
+      enabled: yes
