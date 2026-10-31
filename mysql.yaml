@@ -1,19 +1,17 @@
-- name: configure mysql
+- name: configure mysql server
   hosts: mysql
   become: yes
-
+  
   tasks:
-  - name: copy mysql repo
-    copy:
-      src: mysql.repo
-      dest: /etc/yum.repos.d/mysql.repo
+  - name: enable mysql 8.4
+    command: dnf module enable mysql:8.4 -y
 
   - name: install mysql server
     package:
-      name: mysql-community-server
+      name: mysql-server
       state: present
 
-  - name: start and enable mysql 
+  - name: enable and start mysql
     service:
       name: mysqld
       state: started
